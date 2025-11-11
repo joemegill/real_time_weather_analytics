@@ -46,14 +46,20 @@ services:
   # Weather producer
   # -----------------------
   producer:
-    build: ./src/producer
+    build:
+      context: ./src/producer
+      dockerfile: Dockerfile  # Dockerfile above
     command: python weather_producer.py
+    # container_name: producer
     environment:
-      - API_KEY=${API_KEY}
+      - OPEN_WEATHER_API_KEY=${OPEN_WEATHER_API_KEY}
       - KAFKA_BROKER=${KAFKA_BROKER}
       - TOPIC=${TOPIC}
     depends_on:
       - kafka
+    volumes:
+      - ./src/producer:/opt/src/producer
+
 
   # -----------------------
   # Spark consumer

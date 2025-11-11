@@ -1,7 +1,7 @@
 import json
 import time
 import requests
-# from kafka import KafkaProducer, errors
+from kafka import KafkaProducer, errors
 import os
 from geopy.geocoders import Nominatim
 
@@ -45,7 +45,7 @@ def fetch_weather():
 if __name__ == "__main__":
     while True:
         data = fetch_weather()
-        # producer.send(TOPIC, data)
-        print(f"Sent: {data}")
+        producer.send(TOPIC, data)
+        producer.flush()
         print(data)
         time.sleep(90)

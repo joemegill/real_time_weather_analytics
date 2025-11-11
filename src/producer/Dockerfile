@@ -12,4 +12,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Default command to run the producer
 CMD ["python", "weather_producer.py"]
-
