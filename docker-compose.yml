@@ -1,0 +1,102 @@
+
+services:
+  # -----------------------
+  # Zookeeper for Kafka
+  # -----------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  # -----------------------
+  # Kafka broker
+  # -----------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # -----------------------
+  # PostgreSQL
+  # -----------------------
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: weather_user
+      POSTGRES_PASSWORD: weather_pass
+      POSTGRES_DB: weatherdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  # -----------------------
+  # Weather producer
+  # -----------------------
+  producer:
+    build: ./src/producer
+    command: python weather_producer.py
+    environment:
+      - API_KEY=${API_KEY}
+      - KAFKA_BROKER=${KAFKA_BROKER}
+      - TOPIC=${TOPIC}
+    depends_on:
+      - kafka
+
+  # -----------------------
+  # Spark consumer
+  # -----------------------
+  spark_consumer:
+    build:
+      context: ./src/consumer
+      dockerfile: Dockerfile  # Dockerfile above
+    container_name: spark_consumer
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - TOPIC=weather_data
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=postgres
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      - kafka
+      - postgres
+    volumes:
+      - ./src/consumer:/opt/src/consumer
+
+  # -----------------------
+  # Streamlit dashboard
+  # -----------------------
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - TOPIC=${TOPIC}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+    volumes:
+      - ./dashboard:/app
+    depends_on:
+      - postgres
+
+
+  
+
+
+volumes:
+  pg_data:
