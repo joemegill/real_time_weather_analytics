@@ -16,11 +16,11 @@ engine = create_engine(f'postgresql://{DB_USER}:{DB_PASS}@postgres:5432/weatherd
 
 @st.cache_data(ttl=60)
 def get_data():
-    return pd.read_sql("SELECT * FROM weather_data ORDER BY timestamp DESC LIMIT 100", engine)
+    return pd.read_sql("SELECT * FROM hourly_weather_data ORDER BY timestamp DESC LIMIT 100", engine)
 
 df = get_data()
 
-fig = px.line(df, x='timestamp', y='temp', title='Temperature Over Time')
+fig = px.line(df, x='timestamp', y='temp', title='Hourly Temperature Over Time')
 st.plotly_chart(fig)
 
 st.dataframe(df)

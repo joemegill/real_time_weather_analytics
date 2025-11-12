@@ -9,7 +9,6 @@ BROKER = os.getenv("KAFKA_BROKER")
 TOPIC = "weather_data"
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 
-CITY="London"
 
 
 # Initialize the Nominatim geocoder with a user agent
@@ -46,6 +45,6 @@ if __name__ == "__main__":
     while True:
         data = fetch_weather()
         producer.send(TOPIC, data)
-        producer.flush()
+        
         print(data)
         time.sleep(90)
