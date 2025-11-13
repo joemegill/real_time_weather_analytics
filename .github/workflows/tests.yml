@@ -29,6 +29,8 @@ jobs:
   contract_test:
     runs-on: ubuntu-latest
     needs: [lint_code]
+    environment: env 
+
     env:
       # DB_USER: ${{ secrets.DB_USER }}
       # DB_PASS: ${{ secrets.DB_PASS }}
