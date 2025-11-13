@@ -29,21 +29,44 @@ jobs:
   contract_test:
     runs-on: ubuntu-latest
     needs: [lint_code]
+    env:
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_NAME: weatherdb
+      DB_HOST: postgres
+      OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+      KAFKA_BROKER: kafka:9092
+      TOPIC: weather_data
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Create .env file
+      # - name: Create .env file
+      #   run: |
+      #     cat << EOF > .env
+      #     DB_USER=${{ secrets.DB_USER }}
+      #     DB_PASS=${{ secrets.DB_PASS }}
+      #     DB_NAME=weatherdb
+      #     DB_HOST=postgres
+      #     OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}
+      #     KAFKA_BROKER=kafka:9092
+      #     TOPIC=weather_data
+      #     EOF
+
+      - name: Debug - Check if secrets are set
         run: |
-          cat << EOF > .env
-          DB_USER=${{ secrets.DB_USER }}
-          DB_PASS=${{ secrets.DB_PASS }}
-          DB_NAME=weatherdb
-          DB_HOST=postgres
-          OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}
-          KAFKA_BROKER=kafka:9092
-          TOPIC=weather_data
-          EOF
+          echo "DB_USER is set: ${{ secrets.DB_USER != '' }}"
+          echo "DB_PASS is set: ${{ secrets.DB_PASS != '' }}"
+          echo "API_KEY is set: ${{ secrets.OPEN_WEATHER_API_KEY != '' }}"
+      
+      - name: Debug - Print environment variables (masked)
+        run: |
+          echo "DB_USER=${DB_USER}"
+          echo "DB_PASS length: ${#DB_PASS}"
+          echo "DB_NAME=${DB_NAME}"
+          printenv | grep -E "DB_|KAFKA_|TOPIC|OPEN_WEATHER" || echo "No matching env vars"
+      
       
       - name: Build and Start Docker Services
         # env:
