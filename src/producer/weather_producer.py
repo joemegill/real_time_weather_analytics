@@ -34,7 +34,10 @@ for y in range(10):
 
 def fetch_weather():
     part = "daily,monthly,alerts"
-    url = f"https://api.openweathermap.org/data/3.0/onecall?lat={location.latitude}&lon={location.longitude}&exclude={part}&appid={OPEN_WEATHER_API_KEY}"
+    url = (
+        f"lat={location.latitude}&lon={location.longitude}"
+        f"&exclude={part}&appid={OPEN_WEATHER_API_KEY}"
+        )
     response = requests.get(url)
     return response.json()
 
