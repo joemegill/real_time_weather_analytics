@@ -34,8 +34,6 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Build and Start Docker Services
-        with: # Set the secret as an input
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASS }}
         env:
           # 1. Database Credentials (Crucial for Postgres to start)
           DB_USER: ${{ secrets.DB_USER}}
