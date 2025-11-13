@@ -1,14 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import (
-    from_json,
-    col,
-    avg,
-    window,
-    from_unixtime,
-    explode,
-    cast,
-    current_timestamp,
-)
+from pyspark.sql.functions import from_json, col, from_unixtime, explode
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -21,7 +12,6 @@ from pyspark.sql.types import (
 import os
 import time
 import psycopg2
-from datetime import datetime
 from PostgresWriter import PostgresWriter
 
 
@@ -36,17 +26,15 @@ DB_CONFIG = {
 
 def insert_current(cur, row):
     # 1. Define the SQL template using %s placeholders for data
-    sql = """
-        INSERT INTO current_weather_data 
+    sql = """INSERT INTO current_weather_data
             (timestamp, lat, lon, temp, humidity, description)
-        VALUES 
+        VALUES
             (%s, %s, %s, %s, %s, %s)
-        ON CONFLICT (lat, lon, timestamp) 
+        ON CONFLICT (lat, lon, timestamp)
         DO UPDATE SET
             temp = EXCLUDED.temp,
             humidity = EXCLUDED.humidity,
-            description = EXCLUDED.description;
-    """
+            description = EXCLUDED.description;"""
 
     # 2. Prepare the data tuple. The order MUST match the column order in the INSERT statement.
     # We must use the column names from your Spark DataFrame Row object.
@@ -68,10 +56,11 @@ def insert_current(cur, row):
 def insert_hourly(cur, row):
 
     sql = """
-        INSERT INTO hourly_weather_data 
-        ( lat, lon, timestamp, temp, feels_like, wind_speed, wind_gust, clouds, uvi, rain, snow, pop, humidity, description)
+        INSERT INTO hourly_weather_data
+        (lat, lon, timestamp, temp, feels_like, wind_speed,
+        wind_gust, clouds, uvi, rain, snow, pop, humidity, description)
         VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s)
-        ON CONFLICT (lat, lon, timestamp) 
+        ON CONFLICT (lat, lon, timestamp)
         DO UPDATE SET
             temp = EXCLUDED.temp,
             feels_like = EXCLUDED.feels_like,
@@ -109,7 +98,7 @@ def insert_minute(cur, row):
     sql = """
         INSERT INTO minute_weather_data (timestamp, lat, lon, precipitation)
         VALUES (%s,%s,%s,%s)
-        ON CONFLICT (timestamp, lat, lon) 
+        ON CONFLICT (timestamp, lat, lon)
         DO UPDATE SET
             precipitation = EXCLUDED.precipitation;
     """
@@ -341,15 +330,9 @@ print("psycopg2 conntect normald")
 conn = psycopg2.connect(**DB_CONFIG)
 
 
-query_current = summary_df_current.writeStream.foreach(
-    PostgresWriter(DB_CONFIG, insert_current)
-).start()
-query_hourly = summary_df_hourly.writeStream.foreach(
-    PostgresWriter(DB_CONFIG, insert_hourly)
-).start()
-query_minute = summary_df_minute.writeStream.foreach(
-    PostgresWriter(DB_CONFIG, insert_minute)
-).start()
+query_current = summary_df_current.writeStream.foreach(PostgresWriter(DB_CONFIG, insert_current)).start()
+query_hourly = summary_df_hourly.writeStream.foreach(PostgresWriter(DB_CONFIG, insert_hourly)).start()
+query_minute = summary_df_minute.writeStream.foreach(PostgresWriter(DB_CONFIG, insert_minute)).start()
 
 
 query_current.awaitTermination()
