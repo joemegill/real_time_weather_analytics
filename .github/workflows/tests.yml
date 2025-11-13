@@ -38,6 +38,7 @@ jobs:
           # 1. Database Credentials (Crucial for Postgres to start)
           DB_USER: ${{ secrets.DB_USER_SECRET }}
           DB_PASS: ${{ secrets.DB_PASS_SECRET }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASS_SECRET }}
           DB_NAME: weather_db # If this isn't sensitive, it can be defined here
           
           # 2. API Key (Crucial for the Producer to function)
@@ -48,7 +49,7 @@ jobs:
           KAFKA_BROKER: kafka:9092 # Use the Docker Compose service name and port
           TOPIC: weather_data
         run: |
-          export DB_USER DB_PASS DB_NAME OPEN_WEATHER_API_KEY DB_HOST KAFKA_BROKER TOPIC
+          export DB_USER DB_PASS DB_NAME OPEN_WEATHER_API_KEY DB_HOST KAFKA_BROKER TOPIC POSTGRES_PASSWORD
           docker compose up --build -d
       
       - name: Wait for API to be Healthy
@@ -56,6 +57,7 @@ jobs:
           # 1. Database Credentials (Crucial for Postgres to start)
           DB_USER: ${{ secrets.DB_USER_SECRET }}
           DB_PASS: ${{ secrets.DB_PASS_SECRET }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASS_SECRET }}
           DB_NAME: weather_db # If this isn't sensitive, it can be defined here
           
           # 2. API Key (Crucial for the Producer to function)
@@ -66,7 +68,7 @@ jobs:
           KAFKA_BROKER: kafka:9092 # Use the Docker Compose service name and port
           TOPIC: weather_data
         run: |
-          export DB_USER DB_PASS DB_NAME OPEN_WEATHER_API_KEY DB_HOST KAFKA_BROKER TOPIC
+          export DB_USER DB_PASS DB_NAME OPEN_WEATHER_API_KEY DB_HOST KAFKA_BROKER TOPIC POSTGRES_PASSWORD
           docker compose up --wait
 
       - name: 🐞 Print Postgres Logs if it Exited
