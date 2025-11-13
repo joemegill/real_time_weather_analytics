@@ -55,7 +55,7 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"] # Command to run
+      test: ["CMD-SHELL", "sh", "-c","PGPASSWORD=$$POSTGRES_PASSWORD pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"] # Command to run
       interval: 5s         # Check every 5 seconds
       timeout: 5s          # Fail if check takes longer than 5s
       retries: 5           # Mark as unhealthy after 5 consecutive failures
