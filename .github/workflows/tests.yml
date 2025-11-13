@@ -11,47 +11,41 @@ jobs:
   lint_code:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11' 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install Flake8
-      run: pip install flake8
+      - name: Install Flake8
+        run: pip install flake8
 
-    - name: Run Flake8 Check
-      # Flake8 runs against your Python files to enforce code style
-      run: flake8 . --max-line-length=120 --ignore=E203,W503 
-        
+      - name: Run Flake8 Check
+        run: flake8 . --max-line-length=120 --ignore=E203,W503
+
   # 2. Integration Test: Builds and tests the running Docker container
   contract_test:
     runs-on: ubuntu-latest
-    # This job correctly depends on the linting job
-    needs: [lint_code] 
+    needs: [lint_code]
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Build and Start Docker Services
-      # Assumes a docker-compose.yml file in the root
-      run: docker compose up --build -d
+      - name: Build and Start Docker Services
+        run: docker compose up --build -d
 
-    - name: Wait for API to be Healthy
-      # This waits for all services in docker-compose.yml to pass their healthchecks
-      run: docker compose up --wait
+      - name: Wait for API to be Healthy
+        run: docker compose up --wait
 
-    - name: Set up Python for Test Runner
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11' 
+      - name: Set up Python for Test Runner
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install Testing Dependencies
-      # Install pytest and any other packages your tests need
-      run: pip install pytest requests
+      - name: Install Testing Dependencies
+        run: pip install pytest requests
 
-    - name: Run Pytest Integration Tests
-      # This executes pytest on the host machine against the running Docker service
-      run: pytest tests/
+      - name: Run Pytest Integration Tests
+        run: pytest tests/
