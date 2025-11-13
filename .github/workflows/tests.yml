@@ -47,10 +47,11 @@ jobs:
           # 3. Other required variables that are NOT secrets, but were missing
           KAFKA_BROKER: kafka:9092 # Use the Docker Compose service name and port
           TOPIC: weather_data
-        run: docker compose up --build -d
+        run: |
+          export DB_USER DB_PASS DB_NAME OPEN_WEATHER_API_KEY DB_HOST KAFKA_BROKER TOPIC
+          docker compose up --build -d
       
       - name: Wait for API to be Healthy
-        run: docker compose up --wait
         env:
           # 1. Database Credentials (Crucial for Postgres to start)
           DB_USER: ${{ secrets.DB_USER_SECRET }}
@@ -64,6 +65,9 @@ jobs:
           # 3. Other required variables that are NOT secrets, but were missing
           KAFKA_BROKER: kafka:9092 # Use the Docker Compose service name and port
           TOPIC: weather_data
+        run: |
+          export DB_USER DB_PASS DB_NAME OPEN_WEATHER_API_KEY DB_HOST KAFKA_BROKER TOPIC
+          docker compose up --wait
 
       - name: 🐞 Print Postgres Logs if it Exited
         # This is conditional: it only runs if the step above it failed.
