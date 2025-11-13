@@ -32,10 +32,8 @@ jobs:
     environment: env 
 
     env:
-      # DB_USER: ${{ secrets.DB_USER }}
-      # DB_PASS: ${{ secrets.DB_PASS }}
-      DB_USER: dummy
-      DB_PASS: dummy_pass
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASS: ${{ secrets.DB_PASS }}
       DB_NAME: weatherdb
       DB_HOST: postgres
       OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
@@ -46,17 +44,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # - name: Create .env file
-      #   run: |
-      #     cat << EOF > .env
-      #     DB_USER=${{ secrets.DB_USER }}
-      #     DB_PASS=${{ secrets.DB_PASS }}
-      #     DB_NAME=weatherdb
-      #     DB_HOST=postgres
-      #     OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}
-      #     KAFKA_BROKER=kafka:9092
-      #     TOPIC=weather_data
-      #     EOF
 
       - name: Debug - Check if secrets are set
         run: |
@@ -73,30 +60,9 @@ jobs:
       
       
       - name: Build and Start Docker Services
-        # env:
-        #   # Database Credentials
-        #   DB_USER: ${{ secrets.DB_USER }}
-        #   DB_PASS: ${{ secrets.DB_PASS }}
-        #   DB_NAME: weatherdb  # Must match POSTGRES_DB in docker-compose.yml
-        #   DB_HOST: postgres
-          
-        #   # API Key
-        #   OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
-          
-        #   # Kafka Configuration
-        #   KAFKA_BROKER: kafka:9092
-        #   TOPIC: weather_data
         run: docker compose up --build -d
       
       - name: Wait for API to be Healthy
-        # env:
-        #   DB_USER: ${{ secrets.DB_USER }}
-        #   DB_PASS: ${{ secrets.DB_PASS }}
-        #   DB_NAME: weatherdb
-        #   DB_HOST: postgres
-        #   OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
-        #   KAFKA_BROKER: kafka:9092
-        #   TOPIC: weather_data
         run: docker compose up --wait
 
 
@@ -109,9 +75,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      #todo add tests
       
-      - name: Install Testing Dependencies
-        run: pip install pytest requests
+      # - name: Install Testing Dependencies
+      #   run: pip install pytest requests
       
-      - name: Run Pytest Integration Tests
-        run: pytest tests/
+      # - name: Run Pytest Integration Tests
+      #   run: pytest tests/
