@@ -46,6 +46,8 @@ def insert_current(cur, row):
         row.humidity, # NOTE: If your Spark DF column is 'current_humidity', change this to row.current_humidity
         row.description
     )
+    
+    cur.execute(sql, data)
 
    
 
@@ -70,8 +72,6 @@ def insert_hourly(cur, row):
             humidity = EXCLUDED.humidity,
             description = EXCLUDED.description;
     """
-
-
     
     data = (
             row.lat,
