@@ -1,0 +1,59 @@
+name: CI Pipeline: Linting & Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 1. Code Style Check: Runs Flake8 on the Python source code
+  lint_code:
+    runs-on: ubuntu-latest
+    steps:
+    - name:  Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' 
+
+    - name: Install Flake8
+      run: pip install flake8
+
+    - name: Run Flake8 Check
+      # Flake8 runs against your Python files to enforce code style
+      run: flake8 . --max-line-length=120 --ignore=E203,W503 
+        
+  # 2. Integration Test: Builds and tests the running Docker container
+  contract_test:
+    runs-on: ubuntu-latest
+    # Now correctly depends on the linting job
+    needs: [lint_code] 
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Build and Start Docker Services
+      # Assumes a docker-compose.yml file in the root
+      run: docker compose up --build -d
+
+    - name: Wait for API to be Healthy (Crucial!)
+      # This waits for all services in docker-compose.yml to pass their healthchecks
+      run: docker compose up --wait
+
+    - name: Set up Python for Test Runner
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' 
+
+    - name: ⚙️ Install Testing Dependencies
+      # Install pytest and any other packages your tests need
+      run: pip install pytest requests
+
+    - name: 🧪 Run Pytest Integration Tests
+      # This executes pytest on the host machine against the running Docker service
+      # NOTE: Your tests must use the service name (e.g., http://api:8000) or 'localhost' 
+      # depending on your Docker setup and if your tests are inside a container.
+      run: pytest tests/
