@@ -34,7 +34,6 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Build and Start Docker Services
-        run: docker compose up --build -d
         env:
           # 1. Database Credentials (Crucial for Postgres to start)
           DB_USER: ${{ secrets.DB_USER_SECRET }}
@@ -48,6 +47,7 @@ jobs:
           # 3. Other required variables that are NOT secrets, but were missing
           KAFKA_BROKER: kafka:9092 # Use the Docker Compose service name and port
           TOPIC: weather_data
+        run: docker compose up --build -d
       
       - name: Wait for API to be Healthy
         run: docker compose up --wait
