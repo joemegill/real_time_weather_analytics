@@ -1,4 +1,4 @@
-name: CI Pipeline: Linting & Integration Tests
+name: CI Pipeline - Linting & Integration Tests
 
 on:
   push:
@@ -13,15 +13,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+      
       - name: Install Flake8
         run: pip install flake8
-
+      
       - name: Run Flake8 Check
         run: flake8 . --max-line-length=120 --ignore=E203,W503
 
@@ -32,20 +32,20 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+      
       - name: Build and Start Docker Services
         run: docker compose up --build -d
-
+      
       - name: Wait for API to be Healthy
         run: docker compose up --wait
-
+      
       - name: Set up Python for Test Runner
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
+      
       - name: Install Testing Dependencies
         run: pip install pytest requests
-
+      
       - name: Run Pytest Integration Tests
         run: pytest tests/
