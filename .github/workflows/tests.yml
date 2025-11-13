@@ -30,8 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint_code]
     env:
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASS: ${{ secrets.DB_PASS }}
+      # DB_USER: ${{ secrets.DB_USER }}
+      # DB_PASS: ${{ secrets.DB_PASS }}
+      DB_USER: dummy
+      DB_PASS: dummy_pass
       DB_NAME: weatherdb
       DB_HOST: postgres
       OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
