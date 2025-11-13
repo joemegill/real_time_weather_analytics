@@ -107,7 +107,6 @@ def insert_minute(cur, row):
     cur.execute(sql, data)
 
 
-time.sleep(95)
 
 BROKER = os.getenv("KAFKA_BROKER", "kafka:9092")
 

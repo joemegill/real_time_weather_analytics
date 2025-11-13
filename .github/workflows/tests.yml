@@ -51,6 +51,24 @@ jobs:
       
       - name: Wait for API to be Healthy
         run: docker compose up --wait
+        env:
+          # 1. Database Credentials (Crucial for Postgres to start)
+          DB_USER: ${{ secrets.DB_USER_SECRET }}
+          DB_PASS: ${{ secrets.DB_PASS_SECRET }}
+          DB_NAME: weather_db # If this isn't sensitive, it can be defined here
+          
+          # 2. API Key (Crucial for the Producer to function)
+          OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+          DB_HOST: postgres
+          
+          # 3. Other required variables that are NOT secrets, but were missing
+          KAFKA_BROKER: kafka:9092 # Use the Docker Compose service name and port
+          TOPIC: weather_data
+
+      - name: 🐞 Print Postgres Logs if it Exited
+        # This is conditional: it only runs if the step above it failed.
+        if: failure()  
+        run: docker logs real_time_weather_analytics-postgres-1
       
       - name: Set up Python for Test Runner
         uses: actions/setup-python@v5
