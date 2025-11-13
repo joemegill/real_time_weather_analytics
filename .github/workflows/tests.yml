@@ -32,32 +32,44 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          cat << EOF > .env
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASS=${{ secrets.DB_PASS }}
+          DB_NAME=weatherdb
+          DB_HOST=postgres
+          OPEN_WEATHER_API_KEY=${{ secrets.OPEN_WEATHER_API_KEY }}
+          KAFKA_BROKER=kafka:9092
+          TOPIC=weather_data
+          EOF
       
       - name: Build and Start Docker Services
-        env:
-          # Database Credentials
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASS: ${{ secrets.DB_PASS }}
-          DB_NAME: weatherdb  # Must match POSTGRES_DB in docker-compose.yml
-          DB_HOST: postgres
+        # env:
+        #   # Database Credentials
+        #   DB_USER: ${{ secrets.DB_USER }}
+        #   DB_PASS: ${{ secrets.DB_PASS }}
+        #   DB_NAME: weatherdb  # Must match POSTGRES_DB in docker-compose.yml
+        #   DB_HOST: postgres
           
-          # API Key
-          OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+        #   # API Key
+        #   OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
           
-          # Kafka Configuration
-          KAFKA_BROKER: kafka:9092
-          TOPIC: weather_data
+        #   # Kafka Configuration
+        #   KAFKA_BROKER: kafka:9092
+        #   TOPIC: weather_data
         run: docker compose up --build -d
       
       - name: Wait for API to be Healthy
-        env:
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASS: ${{ secrets.DB_PASS }}
-          DB_NAME: weatherdb
-          DB_HOST: postgres
-          OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
-          KAFKA_BROKER: kafka:9092
-          TOPIC: weather_data
+        # env:
+        #   DB_USER: ${{ secrets.DB_USER }}
+        #   DB_PASS: ${{ secrets.DB_PASS }}
+        #   DB_NAME: weatherdb
+        #   DB_HOST: postgres
+        #   OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+        #   KAFKA_BROKER: kafka:9092
+        #   TOPIC: weather_data
         run: docker compose up --wait
 
 
