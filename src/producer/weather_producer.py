@@ -5,14 +5,13 @@ from kafka import KafkaProducer, errors
 import os
 from geopy.geocoders import Nominatim
 
-BROKER = os.getenv("KAFKA_BROKER") 
+BROKER = os.getenv("KAFKA_BROKER")
 TOPIC = "weather_data"
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 
 
-
 # Initialize the Nominatim geocoder with a user agent
-geolocator = Nominatim(user_agent="my-geocoder-app") 
+geolocator = Nominatim(user_agent="my-geocoder-app")
 
 # Specify the zip code you want to convert
 zip_code = "90210"
@@ -21,13 +20,11 @@ zip_code = "90210"
 location = geolocator.geocode(zip_code)
 
 
-
-
 for y in range(10):
     try:
         producer = KafkaProducer(
             bootstrap_servers=[BROKER],
-            value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
         )
         break
     except errors.NoBrokersAvailable:
@@ -41,10 +38,11 @@ def fetch_weather():
     response = requests.get(url)
     return response.json()
 
+
 if __name__ == "__main__":
     while True:
         data = fetch_weather()
         producer.send(TOPIC, data)
-        
+
         print(data)
         time.sleep(90)

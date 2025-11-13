@@ -1,6 +1,7 @@
 # from pyspark.sql.streaming import ForeachWriter
 import psycopg2
 
+
 class PostgresWriter(object):
     def __init__(self, db_config, insert_fn):
         self.db_config = db_config
