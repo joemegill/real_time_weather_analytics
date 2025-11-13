@@ -10,7 +10,6 @@ from pyspark.sql.types import (
     TimestampType,
 )
 import os
-import time
 import psycopg2
 from PostgresWriter import PostgresWriter
 
@@ -107,9 +106,7 @@ def insert_minute(cur, row):
     cur.execute(sql, data)
 
 
-
 BROKER = os.getenv("KAFKA_BROKER", "kafka:9092")
-
 
 spark = SparkSession.builder.appName("WeatherStreamProcessor").getOrCreate()
 spark.sparkContext.setLogLevel("WARN")
@@ -121,47 +118,6 @@ df = (
     .option("startingOffsets", "earliest")
     .load()
 )
-
-# schema = StructType([
-#     StructField("lat", FloatType(), False),
-#     StructField("lon", FloatType(), False),
-#     StructField("current", StructType([
-#         StructField("dt", LongType(), False),
-#         StructField("temp", FloatType(), True),
-#         StructField("humidity", FloatType(), True),
-#         StructField("feels_like", FloatType(), True),
-#         StructField("clouds", FloatType(), True),
-#         StructField("uvi", FloatType(), True),
-#         StructField("weather", ArrayType(StructType([
-#             StructField("id", FloatType(), True),
-#             StructField("main", StringType(), True),
-#             StructField("description", StringType(), True)
-#         ])), True)
-#     ]), True),
-#     StructField("hourly", StructType([
-#         StructField("dt", LongType(), False),
-#         StructField("temp", FloatType(), True),
-#         StructField("feels_like", FloatType(), True),
-#         StructField("wind_speed", FloatType(), True),
-#         StructField("wind_gust", FloatType(), True),
-#         StructField("clouds", FloatType(), True),
-#         StructField("uvi", FloatType(), True),
-#         StructField("humidity", FloatType(), True),
-#         StructField("pop", FloatType(), True),
-#         StructField("rain", FloatType(), True),
-#         StructField("snow", FloatType(), True),
-#         StructField("weather", ArrayType(StructType([
-#             StructField("id", FloatType(), True),
-#             StructField("main", StringType(), True),
-#             StructField("description", StringType(), True)
-#         ])), True)
-#     ]), True),
-
-#     StructField("minutely", StructType([
-#         StructField("dt", LongType(), False),
-#         StructField("precipitation", FloatType(), True)
-#     ]), True)
-# ])
 
 schema = StructType(
     [
