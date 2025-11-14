@@ -285,9 +285,15 @@ print("psycopg2 conntect normald")
 conn = psycopg2.connect(**DB_CONFIG)
 
 
-query_current = summary_df_current.writeStream.foreach(PostgresWriter(DB_CONFIG, insert_current)).start()
-query_hourly = summary_df_hourly.writeStream.foreach(PostgresWriter(DB_CONFIG, insert_hourly)).start()
-query_minute = summary_df_minute.writeStream.foreach(PostgresWriter(DB_CONFIG, insert_minute)).start()
+query_current = summary_df_current.writeStream.foreach(
+    PostgresWriter(DB_CONFIG, insert_current)
+).start()
+query_hourly = summary_df_hourly.writeStream.foreach(
+    PostgresWriter(DB_CONFIG, insert_hourly)
+).start()
+query_minute = summary_df_minute.writeStream.foreach(
+    PostgresWriter(DB_CONFIG, insert_minute)
+).start()
 
 
 query_current.awaitTermination()

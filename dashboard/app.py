@@ -16,17 +16,23 @@ engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@postgres:5432/weatherd
 
 @st.cache_data(ttl=60)
 def get_data():
-    return pd.read_sql("SELECT * FROM hourly_weather_data ORDER BY timestamp ASC LIMIT 100", engine)
+    return pd.read_sql(
+        "SELECT * FROM hourly_weather_data ORDER BY timestamp ASC LIMIT 100", engine
+    )
 
 
 @st.cache_data(ttl=60)
 def get_data_current():
-    return pd.read_sql("SELECT * FROM current_weather_data ORDER BY timestamp DESC LIMIT 10", engine)
+    return pd.read_sql(
+        "SELECT * FROM current_weather_data ORDER BY timestamp DESC LIMIT 10", engine
+    )
 
 
 @st.cache_data(ttl=60)
 def get_data_minute():
-    return pd.read_sql("SELECT * FROM minute_weather_data ORDER BY timestamp DESC LIMIT 60", engine)
+    return pd.read_sql(
+        "SELECT * FROM minute_weather_data ORDER BY timestamp DESC LIMIT 60", engine
+    )
 
 
 df = get_data()
