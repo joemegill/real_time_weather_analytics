@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, functions as F
 from pyspark.sql.functions import from_json, col, from_unixtime, explode
 from pyspark.sql.types import (
     StructType,
@@ -21,6 +21,10 @@ DB_CONFIG = {
     "password": os.environ.get("DB_PASS"),
     "port": 5432,
 }
+
+
+def convert_temp(col):
+    return (col - F.lit(273.15)) * F.lit(9) / F.lit(5) + F.lit(32)
 
 
 def insert_current(cur, row):
@@ -213,7 +217,7 @@ summary_df_current = parsed_df.select(
     col("data.lat").alias("lat"),
     col("data.lon").alias("lon"),
     from_unixtime(col("data.current.dt")).cast(TimestampType()).alias("timestamp"),
-    col("data.current.temp").alias("temp"),
+    convert_temp(col("data.current.temp")).alias("temp"),
     col("data.current.humidity").alias("humidity"),
     col("data.current.weather")[0]["description"].alias("description"),
 )
@@ -253,8 +257,8 @@ summary_df_hourly = exploded_hourly_df.select(
     # Convert epoch (dt) to timestamp
     from_unixtime(col("hourly_data.dt")).cast(TimestampType()).alias("timestamp"),
     # Selecting the requested fields using the simple aliases (as requested)
-    col("hourly_data.temp").alias("temp"),
-    col("hourly_data.feels_like").alias("feels_like"),
+    convert_temp(col("hourly_data.temp")).alias("temp"),
+    convert_temp(col("hourly_data.feels_like")).alias("feels_like"),
     col("hourly_data.humidity").alias("humidity"),
     col("hourly_data.wind_speed").alias("wind_speed"),
     col("hourly_data.wind_gust").alias("wind_gust"),
@@ -281,7 +285,6 @@ summary_df_minute = exploded_minute_df.select(
 )
 
 
-print("psycopg2 conntect normald")
 conn = psycopg2.connect(**DB_CONFIG)
 
 
@@ -299,7 +302,3 @@ query_minute = summary_df_minute.writeStream.foreach(
 query_current.awaitTermination()
 query_hourly.awaitTermination()
 query_minute.awaitTermination()
-
-
-# TODO fix the usdaet queries
-# add adjust the display to account for them
