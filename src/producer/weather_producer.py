@@ -45,7 +45,7 @@ def main() -> None:
     location = geolocator.geocode(zip_code)
 
     lat = location.latitude
-    lon = location.longintude
+    lon = location.longitude
     api_key = os.getenv("OPEN_WEATHER_API_KEY")
 
     producer = start_kafka(broker)
