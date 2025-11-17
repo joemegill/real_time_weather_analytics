@@ -69,7 +69,13 @@ jobs:
       - name: 🐞 Print Postgres Logs if it Exited
         # This is conditional: it only runs if the step above it failed.
         if: failure()  
-        run: docker logs real_time_weather_analytics-postgres-1
+        run: |
+          docker logs real_time_weather_analytics-postgres-1
+          docker logs spark_consumer
+          docker logs real_time_weather_analytics-producer-1
+          docker logs real_time_weather_analytics-dashboard-1
+          docker logs real_time_weather_analytics-kafka-1
+          docker logs real_time_weather_analytics-zookeeper-1
       
       - name: Set up Python for Test Runner
         uses: actions/setup-python@v5
